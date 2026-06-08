@@ -11,6 +11,7 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
 {
     internal class ControladorScanLine : IControladorRelleno
     {
+        public int DelayMs { get; set; } = 1;
 
         public async Task rellenar(Point inicio, Canvas modelo, Panel panel)
         {
@@ -26,28 +27,30 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
             while (puntos.Count > 0)
             {
                 Point puntoActual = puntos.Pop();
-                int y=puntoActual.Y;
-                int xLeft= puntoActual.X;
+                int y = puntoActual.Y;
+                int xLeft = puntoActual.X;
                 int xRight = puntoActual.X + 1;
 
-                while(xLeft>=0 && bitmap.GetPixel(xLeft, y).ToArgb() == colorObjetivo.ToArgb())
+                while (xLeft >= 0 && bitmap.GetPixel(xLeft, y).ToArgb() == colorObjetivo.ToArgb())
                 {
                     bitmap.SetPixel(xLeft, y, colorRelleno);
                     xLeft--;
                 }
 
-                while(xRight<=bitmap.Width && bitmap.GetPixel(xRight, y).ToArgb() == colorObjetivo.ToArgb())
+                while (xRight < bitmap.Width && bitmap.GetPixel(xRight, y).ToArgb() == colorObjetivo.ToArgb())
                 {
                     bitmap.SetPixel(xRight, y, colorRelleno);
                     xRight++;
                 }
 
-                panel.Refresh();
-                await Task.Delay(5);
+                if (panel != null)
+                {
+                    panel.Refresh();
+                    await Task.Delay(DelayMs);
+                }
 
                 escanearLinea(xLeft + 1, xRight - 1, y - 1, puntos, bitmap, colorObjetivo);
                 escanearLinea(xLeft + 1, xRight - 1, y + 1, puntos, bitmap, colorObjetivo);
-
             }
         }
 

@@ -11,16 +11,17 @@ namespace AlgoritmoRuster.Controlador
 {
     internal class ControladorDDA
     {
-        private Linea linea;
+        public Linea linea { get; private set; }
+        public List<Point> puntos { get; private set; }
 
         public ControladorDDA(Linea linea)
         {
             this.linea = linea;
+            puntos = new List<Point>();
         }
 
-        public List<PointF> generarPuntos()
+        public void generarPuntos()
         {
-            List<PointF> puntos = new List<PointF>();
             float x = linea.puntoInicial.X;
             float y = linea.puntoInicial.Y;
 
@@ -31,32 +32,23 @@ namespace AlgoritmoRuster.Controlador
             float xIncremento = deltaX / k;
             float yIncremento = deltaY / k;
 
-            puntos.Add(linea.puntoInicial);
+            puntos.Add(new Point((int)Math.Round(linea.puntoInicial.X), (int)Math.Round(linea.puntoInicial.Y)));
 
             for (int i = 0; i < k; i++)
             {
                 x += xIncremento;
                 y += yIncremento;
-                PointF punto = new PointF((float)Math.Round(x), (float)Math.Round(y));
+                Point punto = new Point((int)Math.Round(x), (int)Math.Round(y));
                 puntos.Add(punto);
             }
-
-            return puntos;
         }
 
         public void dibujarFigura(Graphics g)
         {
             int grosorLinea = 3;
-            List<PointF> puntos = new List<PointF>();
-
-            puntos = generarPuntos();
-
             using (Brush b = new SolidBrush(Color.Red))
-                foreach (PointF p in puntos)
-                    g.FillRectangle(b, p.X-grosorLinea/2, p.Y-grosorLinea/2, grosorLinea, grosorLinea);
-
-            using (Pen pen = new Pen(Color.Aquamarine, 1))
-                g.DrawLine(pen, linea.puntoInicial, linea.puntoFinal);
+                foreach (Point p in puntos)
+                    g.FillRectangle(b, p.X - grosorLinea / 2, p.Y - grosorLinea / 2, grosorLinea, grosorLinea);
         }
     }
 }

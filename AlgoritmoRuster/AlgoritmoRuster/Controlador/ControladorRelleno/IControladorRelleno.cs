@@ -11,7 +11,7 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
 {
     internal interface IControladorRelleno
     {
+        int DelayMs { get; set; }
         Task rellenar(Point inicio, Canvas modelo, Panel panelDibujo);
-
     }
 }

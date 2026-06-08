@@ -24,13 +24,6 @@ namespace AlgoritmoRuster.Vista
             frmLineaDDA.Show();
         }
 
-        private void celdasDDAToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FrmCeldasDDA frmCeldasDDA = new FrmCeldasDDA();
-            frmCeldasDDA.MdiParent = this;
-            frmCeldasDDA.Show();
-        }
-
         private void puntoMedioToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FrmCircunferencia frmCircunferencia = new FrmCircunferencia();
@@ -73,6 +66,13 @@ namespace AlgoritmoRuster.Vista
             frmCircunferencia.Show();
         }
 
+        private void comparacionCircToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmComparacionCircunferencia frm = new FrmComparacionCircunferencia();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
         private void cohenSoutherlandToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FrmCohenSoutherland frmCohen = new FrmCohenSoutherland();
@@ -80,5 +80,67 @@ namespace AlgoritmoRuster.Vista
             frmCohen.Show();
         }
 
+        private void comparacionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmComparacionLineas frmComparacion = new FrmComparacionLineas();
+            frmComparacion.MdiParent = this;
+            frmComparacion.Show();
+        }
+
+        private void comparacionRellenoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmComparacionRelleno frm = new FrmComparacionRelleno();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
+        private void cyrusBeckToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmCyrusBeck frmCyrus = new FrmCyrusBeck();
+            frmCyrus.MdiParent = this;
+            frmCyrus.Show();
+        }
+
+        private void liangBarskyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmLiangBarsky frm = new FrmLiangBarsky();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
+        private void comparacionRecorteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmComparacionRecorte frm = new FrmComparacionRecorte();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
+        private void sutherlandHodgmanToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmSutherlandHodgman frm = new FrmSutherlandHodgman();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
+        private void weilerAthertonToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmWeilerAtherton frm = new FrmWeilerAtherton();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
+        private void greinerHormannToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmGreinerHormann frm = new FrmGreinerHormann();
+            frm.MdiParent = this;
+            frm.Show();
+        }
+
+        private void comparacionPoligonoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmComparacionPoligono frm = new FrmComparacionPoligono();
+            frm.MdiParent = this;
+            frm.Show();
+        }
     }
 }

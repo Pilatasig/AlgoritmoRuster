@@ -8,60 +8,60 @@ using System.Threading.Tasks;
 
 namespace AlgoritmoRuster.Controlador
 {
-    internal class ControladorPuntoMedio
+internal class ControladorPuntoMedio
+{
+    public List<Point> puntos { get; private set; }
+    public Circunferencia c { get; private set; }
+
+    public ControladorPuntoMedio(Circunferencia circunferencia)
     {
-        public List<PointF> puntos { get; private set; }
-        public Circunferencia c { get; private set; }
+        puntos = new List<Point>();
+        this.c = circunferencia;
+    }
 
-        public ControladorPuntoMedio(Circunferencia circunferencia)
+    public void generarPuntos()
+    {
+        int cx = (int)Math.Round(c.centro.X);
+        int cy = (int)Math.Round(c.centro.Y);
+        int x = 0;
+        int y = (int)Math.Round(c.radio);
+        int p = 1 - (int)Math.Round(c.radio);
+        puntos.Clear();
+        crearPuntosSimetricos(cx, cy, x, y);
+
+        while (x < y)
         {
-            puntos = new List<PointF>();
-            this.c = circunferencia;
-        }
-
-        public void generarPuntos()
-        {
-            float x = 0;
-            float y = c.radio;
-            float p = 1 - c.radio;
-            puntos.Clear();
-            crearPuntosSimetricos(c.centro.X, c.centro.Y, x, y);
-
-            while (x < y)
+            x++;
+            if (p < 0)
+                p += 2 * x + 3;
+            else
             {
-                x++;
-                if (p < 0)
-                    p += 2 * x + 3;
-                else
-                {
-                    y--;
-                    p += 2 * (x - y) + 5;
-                }
-                crearPuntosSimetricos(c.centro.X, c.centro.Y, x, y);
+                y--;
+                p += 2 * (x - y) + 5;
             }
-        }
-
-        private void crearPuntosSimetricos(float cx, float cy, float x, float y)
-        {
-            puntos.Add(new PointF(cx + x, cy + y));
-            puntos.Add(new PointF(cx - x, cy + y));
-            puntos.Add(new PointF(cx + x, cy - y));
-            puntos.Add(new PointF(cx - x, cy - y));
-            puntos.Add(new PointF(cx + y, cy + x));
-            puntos.Add(new PointF(cx - y, cy + x));
-            puntos.Add(new PointF(cx + y, cy - x));
-            puntos.Add(new PointF(cx - y, cy - x));
-        }
-
-        public void dibujarFigura(Graphics g)
-        {
-            generarPuntos();
-
-            using (Brush b = new SolidBrush(Color.Red))
-                foreach (PointF p in puntos)
-                {
-                    g.FillEllipse(b, p.X - 1, p.Y - 1, 2, 2);
-                }
+            crearPuntosSimetricos(cx, cy, x, y);
         }
     }
+
+    private void crearPuntosSimetricos(int cx, int cy, int x, int y)
+    {
+        puntos.Add(new Point(cx + x, cy + y));
+        puntos.Add(new Point(cx - x, cy + y));
+        puntos.Add(new Point(cx + x, cy - y));
+        puntos.Add(new Point(cx - x, cy - y));
+        puntos.Add(new Point(cx + y, cy + x));
+        puntos.Add(new Point(cx - y, cy + x));
+        puntos.Add(new Point(cx + y, cy - x));
+        puntos.Add(new Point(cx - y, cy - x));
+    }
+
+    public void dibujarFigura(Graphics g)
+    {
+        generarPuntos();
+
+        using (Brush b = new SolidBrush(Color.Red))
+            foreach (Point p in puntos)
+                g.FillRectangle(b, p.X - 1, p.Y - 1, 2, 2);
+    }
+}
 }

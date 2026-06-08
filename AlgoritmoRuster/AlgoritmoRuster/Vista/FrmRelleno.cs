@@ -2,13 +2,9 @@
 using AlgoritmoRuster.Modelo;
 using AlgoritmoRuster.Utils;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
+using System.Drawing.Imaging;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,15 +12,16 @@ namespace AlgoritmoRuster.Vista
 {
     public partial class FrmRelleno : Form
     {
-
         private Canvas modelo;
         private ControladorCanvas controlador;
-
+        private DibujadorPlano dibujadorPlano;
         private bool esPrimerClic = true;
         private Point primerClic;
+
         public FrmRelleno()
         {
             InitializeComponent();
+            dibujadorPlano = new DibujadorPlano();
         }
 
         private void btnCirculo_Click(object sender, EventArgs e)
@@ -72,7 +69,7 @@ namespace AlgoritmoRuster.Vista
 
             string herramienta = modelo.herramientaSeleccionada;
 
-            if (herramienta == "Circulo" || herramienta == "Rectangulo" ||herramienta=="Estrella")
+            if (herramienta == "Circulo" || herramienta == "Rectangulo" || herramienta == "Estrella")
             {
                 if (esPrimerClic)
                 {
@@ -87,18 +84,53 @@ namespace AlgoritmoRuster.Vista
             }
             else if (herramienta == "Balde")
             {
+                controlador.DelayMs = obtenerDelay();
                 panelDibujo.Enabled = false;
                 await controlador.aplicarRelleno(e.Location, panelDibujo);
                 panelDibujo.Enabled = true;
             }
-
             panelDibujo.Invalidate();
+        }
+
+        private int obtenerDelay()
+        {
+            int valorInvertido = 101 - trackBarVelocidad.Value;
+            return Math.Max(0, valorInvertido);
         }
 
         private void panelDibujo_Paint(object sender, PaintEventArgs e)
         {
-            if (controlador == null) return;
-            e.Graphics.DrawImage(controlador.getBitMap(), 0, 0);
+            e.Graphics.Clear(Color.White);
+            dibujadorPlano.Dibujar(e.Graphics, panelDibujo.Width, panelDibujo.Height);
+            if (controlador != null)
+            {
+                Bitmap bmp = controlador.getBitMap();
+                using (var attr = new System.Drawing.Imaging.ImageAttributes())
+                {
+                    attr.SetColorKey(Color.White, Color.White);
+                    e.Graphics.DrawImage(bmp,
+                        new Rectangle(0, 0, bmp.Width, bmp.Height),
+                        0, 0, bmp.Width, bmp.Height,
+                        GraphicsUnit.Pixel, attr);
+                }
+            }
+        }
+
+        private void trackBarVelocidad_Scroll(object sender, EventArgs e)
+        {
+            lblVelocidad.Text = $"Velocidad: {trackBarVelocidad.Value}";
+        }
+
+        private void btnResetear_Click(object sender, EventArgs e)
+        {
+            controlador.setHerramienta("Circulo");
+            resetearClics();
+            modelo = new Canvas(panelDibujo.Width, panelDibujo.Height);
+            controlador = new ControladorCanvas(modelo);
+            controlador.setColor(Color.Black);
+            panelDibujo.Enabled = true;
+            cmbAlgoritmo_SelectedIndexChanged(null, null);
+            panelDibujo.Invalidate();
         }
 
         private void FrmRelleno_Load(object sender, EventArgs e)
@@ -113,16 +145,12 @@ namespace AlgoritmoRuster.Vista
                 null, panelDibujo, new object[] { true });
 
             cmbAlgoritmo.Items.Clear();
-
             cmbAlgoritmo.Items.Add("Inundacion Recursivo");
             cmbAlgoritmo.Items.Add("Inundacion 8 vecinos");
             cmbAlgoritmo.Items.Add("ScanLines");
-
             cmbAlgoritmo.SelectedIndex = 0;
 
             panelColor.BackColor = colorDialog.Color;
-
-            
         }
 
         private void cmbAlgoritmo_SelectedIndexChanged(object sender, EventArgs e)
@@ -133,19 +161,35 @@ namespace AlgoritmoRuster.Vista
             {
                 case "Inundacion Recursivo":
                     controlador.controladorRelleno = new ControladorInundacion();
+                    lblTitulo.Text = "Inundacion Recursivo";
+                    lblFormula.Text = "Formula: Comparacion recursiva 4-vecinos";
+                    lblCriterio.Text = "Criterio: Llamada recursiva en N, S, E, O";
+                    lblTipo.Text = "Tipo: Relleno por inundacion recursivo";
+                    lblComplejidad.Text = "Complejidad: O(n) - riesgo de stack overflow";
+                    lblDecision.Text = "Decision: Usa recursion (pila del sistema)";
                     break;
 
                 case "Inundacion 8 vecinos":
                     controlador.controladorRelleno = new ControladorCola();
+                    lblTitulo.Text = "Inundacion 8 vecinos";
+                    lblFormula.Text = "Formula: Comparacion con cola de pixeles";
+                    lblCriterio.Text = "Criterio: Procesa 8 direcciones por pixel";
+                    lblTipo.Text = "Tipo: Relleno por inundacion con cola";
+                    lblComplejidad.Text = "Complejidad: O(n) - evita stack overflow";
+                    lblDecision.Text = "Decision: Usa cola (memoria heap)";
                     break;
 
                 case "ScanLines":
                     controlador.controladorRelleno = new ControladorScanLine();
+                    lblTitulo.Text = "ScanLines";
+                    lblFormula.Text = "Formula: Relleno horizontal por scanline";
+                    lblCriterio.Text = "Criterio: Escanea lineas horizontales continuas";
+                    lblTipo.Text = "Tipo: Relleno por scanline + pila";
+                    lblComplejidad.Text = "Complejidad: O(n) - optimo para areas grandes";
+                    lblDecision.Text = "Decision: Agrupa pixeles en lineas continuas";
                     break;
             }
-
             resetearClics();
         }
-
     }
 }

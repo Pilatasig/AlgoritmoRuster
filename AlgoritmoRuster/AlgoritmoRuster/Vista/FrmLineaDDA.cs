@@ -3,67 +3,153 @@ using AlgoritmoRuster.Modelo;
 using AlgoritmoRuster.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AlgoritmoRuster.Vista
 {
     public partial class FrmLineaDDA : Form
     {
+        private ControladorDDA controladorDDA;
+        private ControladorProgresivo controladorProgresivo;
+        private DibujadorPlano dibujadorPlano;
         private Point? puntoInicial = null;
         private Point? puntoFinal = null;
+        private Color colorLinea = Color.Red;
 
         public FrmLineaDDA()
         {
             InitializeComponent();
-        }
-
-        private void limpiarPanel()
-        {
-            panelDibujo.Invalidate();
-        }
-
-        private void panel1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
+            controladorProgresivo = new ControladorProgresivo();
+            controladorProgresivo.ProgresoActualizado += () =>
             {
-                if (puntoInicial == null)
-                {
-                    puntoInicial = e.Location;
-                    return;
-                }
-                else if (puntoFinal == null)
-                {
-                    puntoFinal = e.Location;
+                if (panelDibujo.IsHandleCreated)
+                    panelDibujo.Invalidate();
+            };
+            dibujadorPlano = new DibujadorPlano();
+            configurarTabla();
+        }
 
-                    Linea nuevaLinea = new Linea(puntoInicial.Value, puntoFinal.Value);
+        private void configurarTabla()
+        {
+            dvgCoordenadas.Columns.Clear();
+            dvgCoordenadas.Columns.Add("Num", "N°");
+            dvgCoordenadas.Columns.Add("X", "Coordenada X");
+            dvgCoordenadas.Columns.Add("Y", "Coordenada Y");
+            dvgCoordenadas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
 
-                    ControladorDDA controladorDDA = new ControladorDDA(nuevaLinea);
-
-                    using (Graphics g = panelDibujo.CreateGraphics())
-                    {
-                        controladorDDA.dibujarFigura(g);
-                    }
-
-                    puntoInicial = null;
-                    puntoFinal = null;
-                }
+        private void rellenarTabla()
+        {
+            dvgCoordenadas.Rows.Clear();
+            if (controladorDDA == null) return;
+            int indice = 1;
+            foreach (Point p in controladorDDA.puntos)
+            {
+                dvgCoordenadas.Rows.Add(indice, p.X, p.Y);
+                indice++;
             }
+        }
+
+        private void panelDibujo_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            if (puntoInicial == null)
+            {
+                puntoInicial = e.Location;
+                return;
+            }
+            if (puntoFinal == null)
+            {
+                puntoFinal = e.Location;
+                Linea linea = new Linea(puntoInicial.Value, puntoFinal.Value);
+                controladorDDA = new ControladorDDA(linea);
+                controladorDDA.generarPuntos();
+                rellenarTabla();
+
+                if (chkProgresivo.Checked)
+                    controladorProgresivo.IniciarProgresivo(controladorDDA.puntos);
+                else
+                {
+                    controladorProgresivo.IniciarPasoAPaso(controladorDDA.puntos);
+                    controladorProgresivo.MostrarTodo();
+                }
+
+                panelDibujo.Invalidate();
+                puntoInicial = puntoFinal = null;
+            }
+        }
+
+        private void panelDibujo_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.Clear(Color.White);
+            dibujadorPlano.Dibujar(e.Graphics, panelDibujo.Width, panelDibujo.Height);
+
+            if (controladorDDA == null) return;
+
+            List<Point> puntosADibujar = controladorProgresivo.ObtenerPuntosActuales();
+            int grosorLinea = 3;
+            using (Brush b = new SolidBrush(colorLinea))
+                foreach (Point p in puntosADibujar)
+                    e.Graphics.FillRectangle(b, p.X - grosorLinea / 2, p.Y - grosorLinea / 2, grosorLinea, grosorLinea);
+        }
+
+        private void btnPaso_Click(object sender, EventArgs e)
+        {
+            controladorProgresivo.AvanzarUnPaso();
+            if (controladorProgresivo.EstaCompleto)
+                btnPaso.Enabled = false;
+        }
+
+        private void btnMostrarTodo_Click(object sender, EventArgs e)
+        {
+            controladorProgresivo.MostrarTodo();
+            btnPaso.Enabled = false;
+        }
+
+        private void chkProgresivo_CheckedChanged(object sender, EventArgs e)
+        {
+            btnPaso.Enabled = !chkProgresivo.Checked;
+            if (chkProgresivo.Checked && controladorProgresivo.HayPuntos && !controladorProgresivo.EstaCompleto)
+                controladorProgresivo.Reanudar();
+            else if (!chkProgresivo.Checked)
+                controladorProgresivo.Pausar();
+        }
+
+        private void trackBarVelocidad_Scroll(object sender, EventArgs e)
+        {
+            int valorInvertido = 101 - trackBarVelocidad.Value;
+            controladorProgresivo.Interval = valorInvertido * 5;
+            lblVelocidad.Text = $"Velocidad: {trackBarVelocidad.Value}";
         }
 
         private void btnResetear_Click(object sender, EventArgs e)
         {
-            limpiarPanel();
+            puntoInicial = null;
+            puntoFinal = null;
+            controladorDDA = null;
+            controladorProgresivo.Limpiar();
+            dvgCoordenadas.Rows.Clear();
+            btnPaso.Enabled = false;
+            panelDibujo.Invalidate();
+        }
+
+        private void btnColor_Click(object sender, EventArgs e)
+        {
+            colorDialog.Color = colorLinea;
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                colorLinea = colorDialog.Color;
+                btnColor.BackColor = colorLinea;
+                panelDibujo.Invalidate();
+            }
         }
 
         private void FrmLineaDDA_Load(object sender, EventArgs e)
         {
             DisenoUI.AplicarTema(this);
+            btnPaso.Enabled = false;
+            btnColor.BackColor = colorLinea;
         }
     }
 }

@@ -11,9 +11,10 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
 {
     internal class ControladorCola : IControladorRelleno
     {
+        public int DelayMs { get; set; } = 1;
+
         public async Task rellenar(Point inicio, Canvas modelo, Panel panel)
         {
-
             Bitmap bitmap = modelo.bitmapCanvas;
             Color colorObjetivo = bitmap.GetPixel(inicio.X, inicio.Y);
             Color colorRelleno = modelo.currentColor;
@@ -29,12 +30,15 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
                 if (pixel.X < 0 || pixel.X >= bitmap.Width || pixel.Y < 0 || pixel.Y >= bitmap.Height)
                     continue;
 
-                if(bitmap.GetPixel(pixel.X, pixel.Y).ToArgb() == colorObjetivo.ToArgb())
+                if (bitmap.GetPixel(pixel.X, pixel.Y).ToArgb() == colorObjetivo.ToArgb())
                 {
                     bitmap.SetPixel(pixel.X, pixel.Y, colorRelleno);
 
-                    panel.Refresh();
-                    await Task.Delay(1);
+                    if (panel != null)
+                    {
+                        panel.Refresh();
+                        await Task.Delay(DelayMs);
+                    }
 
                     pixels.Enqueue(new Point(pixel.X, pixel.Y - 1));
                     pixels.Enqueue(new Point(pixel.X + 1, pixel.Y - 1));
@@ -46,7 +50,6 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
                     pixels.Enqueue(new Point(pixel.X - 1, pixel.Y - 1));
                 }
             }
-
         }
     }
 }

@@ -1,41 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace AlgoritmoRuster.Controlador.ControladorCorteLinea
 {
     internal class ControladorCohen
     {
+        public float XMin { get; set; } = -4.0f;
+        public float XMax { get; set; } = 4.0f;
+        public float YMin { get; set; } = -3.0f;
+        public float YMax { get; set; } = 3.0f;
 
-        public const float X_MIN = -4.0f;
-        public const float X_MAX = 4.0f;
-        public const float Y_MIN = -3.0f;
-        public const float Y_MAX = 3.0f;
-
-        private const int DENTRO = 0;    
-        private const int IZQUIERDA = 1; 
-        private const int DERECHA = 2;   
-        private const int ABAJO = 4;     
-        private const int ARRIBA = 8;    
-        
+        private const int DENTRO = 0;
+        private const int IZQUIERDA = 1;
+        private const int DERECHA = 2;
+        private const int ABAJO = 4;
+        private const int ARRIBA = 8;
 
         private int CalcularOutcode(double x, double y)
         {
             int codigo = DENTRO;
-
-            if (x < X_MIN) codigo |= IZQUIERDA;
-            else if (x > X_MAX) codigo |= DERECHA;
-
-            if (y < Y_MIN) codigo |= ABAJO;
-            else if (y > Y_MAX) codigo |= ARRIBA;  
-
+            if (x < XMin) codigo |= IZQUIERDA;
+            else if (x > XMax) codigo |= DERECHA;
+            if (y < YMin) codigo |= ABAJO;
+            else if (y > YMax) codigo |= ARRIBA;
             return codigo;
         }
 
-        public bool RecortarLineaParametrica(ref PointF p1, ref PointF p2)
+        public bool RecortarLinea(ref PointF p1, ref PointF p2)
         {
             double x1 = p1.X, y1 = p1.Y;
             double x2 = p2.X, y2 = p2.Y;
@@ -46,51 +36,45 @@ namespace AlgoritmoRuster.Controlador.ControladorCorteLinea
 
             while (true)
             {
-                
                 if ((outcode1 | outcode2) == 0)
                 {
                     aceptar = true;
                     break;
                 }
-                
                 else if ((outcode1 & outcode2) != 0)
                 {
                     break;
                 }
-                
                 else
                 {
                     double x = 0, y = 0;
-                    double t = 0;
                     int outcodeOut = (outcode1 != DENTRO) ? outcode1 : outcode2;
 
-                   
                     if ((outcodeOut & ARRIBA) != 0)
                     {
-                        t = (Y_MAX - y1) / (y2 - y1);
+                        double t = (YMax - y1) / (y2 - y1);
                         x = x1 + t * (x2 - x1);
-                        y = Y_MAX;
+                        y = YMax;
                     }
                     else if ((outcodeOut & ABAJO) != 0)
                     {
-                        t = (Y_MIN - y1) / (y2 - y1);
+                        double t = (YMin - y1) / (y2 - y1);
                         x = x1 + t * (x2 - x1);
-                        y = Y_MIN;
+                        y = YMin;
                     }
                     else if ((outcodeOut & DERECHA) != 0)
                     {
-                        t = (X_MAX - x1) / (x2 - x1);
+                        double t = (XMax - x1) / (x2 - x1);
                         y = y1 + t * (y2 - y1);
-                        x = X_MAX;
+                        x = XMax;
                     }
                     else if ((outcodeOut & IZQUIERDA) != 0)
                     {
-                        t = (X_MIN - x1) / (x2 - x1);
+                        double t = (XMin - x1) / (x2 - x1);
                         y = y1 + t * (y2 - y1);
-                        x = X_MIN;
+                        x = XMin;
                     }
 
-                   
                     if (outcodeOut == outcode1)
                     {
                         x1 = x; y1 = y;
@@ -110,9 +94,7 @@ namespace AlgoritmoRuster.Controlador.ControladorCorteLinea
                 p2 = new PointF((float)x2, (float)y2);
                 return true;
             }
-
             return false;
         }
     }
-
 }

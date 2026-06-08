@@ -11,6 +11,7 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
 {
     internal class ControladorInundacion : IControladorRelleno
     {
+        public int DelayMs { get; set; } = 1;
 
         public async Task rellenar(Point inicio, Canvas modelo, Panel panel)
         {
@@ -30,13 +31,16 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
 
             bitmap.SetPixel(x, y, colorRelleno);
 
-            panel.Refresh();
-            await Task.Delay(1);
+            if (panel != null)
+            {
+                panel.Refresh();
+                await Task.Delay(DelayMs);
+            }
 
-            aplicarRelleno(x, y - 1, bitmap, colorObjetivo, colorRelleno, panel);
-            aplicarRelleno(x + 1, y, bitmap, colorObjetivo, colorRelleno, panel);
-            aplicarRelleno(x, y + 1, bitmap, colorObjetivo, colorRelleno, panel);
-            aplicarRelleno(x - 1, y, bitmap, colorObjetivo, colorRelleno, panel);
+            _ = aplicarRelleno(x, y - 1, bitmap, colorObjetivo, colorRelleno, panel);
+            _ = aplicarRelleno(x + 1, y, bitmap, colorObjetivo, colorRelleno, panel);
+            _ = aplicarRelleno(x, y + 1, bitmap, colorObjetivo, colorRelleno, panel);
+            _ = aplicarRelleno(x - 1, y, bitmap, colorObjetivo, colorRelleno, panel);
         }
     }
 }

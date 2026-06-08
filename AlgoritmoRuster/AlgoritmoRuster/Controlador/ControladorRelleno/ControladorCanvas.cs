@@ -47,9 +47,16 @@ namespace AlgoritmoRuster.Controlador.ControladorRelleno
             }
         }
 
+        public int DelayMs
+        {
+            get => controladorRelleno?.DelayMs ?? 1;
+            set { if (controladorRelleno != null) controladorRelleno.DelayMs = value; }
+        }
+
         public async Task aplicarRelleno(Point inicio, Panel panel)
         {
-            controladorRelleno?.rellenar(inicio, modelo, panel);
+            if (controladorRelleno != null)
+                await controladorRelleno.rellenar(inicio, modelo, panel);
         }
     }
 }
