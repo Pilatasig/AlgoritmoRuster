@@ -142,5 +142,12 @@ namespace AlgoritmoRuster.Vista
             frm.MdiParent = this;
             frm.Show();
         }
+
+        private void bezierToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmBezier frm = new FrmBezier();
+            frm.MdiParent = this;
+            frm.Show();
+        }
     }
 }

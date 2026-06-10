@@ -1,0 +1,17 @@
+package ec.edu.monster.repositorio;
+
+import ec.edu.monster.entidades.Familiar;
+import ec.edu.monster.entidades.FamiliarId;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface FamiliarRepositorio extends JpaRepository<Familiar, FamiliarId> {
+
+    List<Familiar> findByEmpleadoCodigo(String empleadoCodigo);
+
+    @Query("SELECT MAX(f.id.codigo) FROM Familiar f WHERE f.id.codigoEmpleado = ?1")
+    String findLastCodigoByEmpleado(String empleadoCodigo);
+}

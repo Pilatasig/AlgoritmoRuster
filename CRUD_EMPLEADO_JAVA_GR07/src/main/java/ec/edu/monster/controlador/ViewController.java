@@ -1,0 +1,48 @@
+package ec.edu.monster.controlador;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class ViewController {
+
+    @GetMapping("/")
+    public String irAlLoginPorDefecto() {
+        return "login";
+    }
+
+    @GetMapping("/login")
+    public String mostrarLogin() {
+        return "login"; 
+    }
+
+    @GetMapping("/registro")
+    public String mostrarRegistro() {
+        return "registro"; 
+    }
+    
+    @GetMapping("/departamentos")   
+    public String mostrarDepartamentos(){
+        return "departamentos";
+    }
+    
+    @GetMapping("/cargos")
+    public String mostrarCargos(){
+        return "cargos";
+    }
+    
+    @GetMapping("/menu")
+    public String mostrarMenuPrincipal(){
+        return "menu";
+    }
+
+    @GetMapping("/empleados")
+    public String mostrarEmpleados(){
+        return "empleado";
+    }
+
+    @GetMapping("/familiares")
+    public String mostrarFamiliares(){
+        return "familiar";
+    }
+}

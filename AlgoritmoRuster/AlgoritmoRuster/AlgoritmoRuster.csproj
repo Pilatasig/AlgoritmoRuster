@@ -49,6 +49,7 @@
     <Compile Include="Controlador\ControladorCircunferencia\ControladorIncremental.cs" />
     <Compile Include="Controlador\ControladorCircunferencia\ControladorParamétrica.cs" />
     <Compile Include="Controlador\ControladorCircunferencia\ControladorPuntoMedio.cs" />
+    <Compile Include="Controlador\ControladorCurva\ControladorBezier.cs" />
     <Compile Include="Controlador\ControladorCorteLinea\ControladorCohen.cs" />
     <Compile Include="Controlador\ControladorCortePoligono\ControladorSutherlandHodgman.cs" />
     <Compile Include="Controlador\ControladorCortePoligono\ControladorWeilerAtherton.cs" />
@@ -190,6 +191,12 @@
     <Compile Include="Vista\FrmGreinerHormann.Designer.cs">
       <DependentUpon>FrmGreinerHormann.cs</DependentUpon>
     </Compile>
+    <Compile Include="Vista\FrmBezier.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmBezier.Designer.cs">
+      <DependentUpon>FrmBezier.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -249,6 +256,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Vista\FrmGreinerHormann.resx">
       <DependentUpon>FrmGreinerHormann.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Vista\FrmBezier.resx">
+      <DependentUpon>FrmBezier.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

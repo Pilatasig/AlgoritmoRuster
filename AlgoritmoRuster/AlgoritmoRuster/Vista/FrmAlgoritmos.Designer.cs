@@ -39,6 +39,8 @@
             this.parametricaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.incrementalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.comparacionCircToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.curvasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bezierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rellenoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rellenoFlodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.comparacionRellenoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,6 +63,7 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lineasToolStripMenuItem,
             this.circunferenciaToolStripMenuItem,
+            this.curvasToolStripMenuItem,
             this.rellenoToolStripMenuItem,
             this.recortesToolStripMenuItem,
             this.recortePoligonosToolStripMenuItem});
@@ -147,6 +150,21 @@
             this.comparacionCircToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.comparacionCircToolStripMenuItem.Text = "Comparacion";
             this.comparacionCircToolStripMenuItem.Click += new System.EventHandler(this.comparacionCircToolStripMenuItem_Click);
+            // 
+            // curvasToolStripMenuItem
+            // 
+            this.curvasToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bezierToolStripMenuItem});
+            this.curvasToolStripMenuItem.Name = "curvasToolStripMenuItem";
+            this.curvasToolStripMenuItem.Size = new System.Drawing.Size(70, 24);
+            this.curvasToolStripMenuItem.Text = "Curvas";
+            // 
+            // bezierToolStripMenuItem
+            // 
+            this.bezierToolStripMenuItem.Name = "bezierToolStripMenuItem";
+            this.bezierToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.bezierToolStripMenuItem.Text = "Bezier";
+            this.bezierToolStripMenuItem.Click += new System.EventHandler(this.bezierToolStripMenuItem_Click);
             // 
             // rellenoToolStripMenuItem
             // 
@@ -293,5 +311,7 @@
         private System.Windows.Forms.ToolStripMenuItem weilerAthertonToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem greinerHormannToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem comparacionPoligonoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem curvasToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bezierToolStripMenuItem;
     }
 }
