@@ -37,18 +37,38 @@ public class FamiliarServicio {
 
     @Transactional
     public Familiar guardar(Familiar familiar) {
-        Empleado emp = empleadoRepo.findById(familiar.getId().getCodigoEmpleado())
+        System.out.println("=== [FAMILIAR SERVICE] guardar() ===");
+        System.out.println("Buscando empleado con codigo: " + familiar.getId().getCodigoEmpleado());
+        empleadoRepo.findById(familiar.getId().getCodigoEmpleado())
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
+        validarCedulaUnica(familiar.getCedula(), null);
+
         familiar.getId().setCodigo(generarSiguienteCodigo(familiar.getId().getCodigoEmpleado()));
-        familiar.setEmpleado(emp);
+        System.out.println("Codigo generado para familiar: " + familiar.getId().getCodigo());
 
         if (familiar.getSexo() != null && familiar.getSexo().getCodigo() != null) {
             Sexo s = sexoRepo.findById(familiar.getSexo().getCodigo()).orElse(null);
+            System.out.println("Sexo resuelto: " + (s != null ? s.getCodigo() : "NULL"));
             familiar.setSexo(s);
         }
 
-        return familiarRepo.save(familiar);
+        System.out.println("Intentando guardar Familiar con PEEMP_CODIGO=" + familiar.getId().getCodigoEmpleado()
+                + ", PEFAM_CODIGO=" + familiar.getId().getCodigo()
+                + ", PEFAM_CEDULA=" + familiar.getCedula()
+                + ", PESEX_CODIGO=" + (familiar.getSexo() != null ? familiar.getSexo().getCodigo() : "NULL"));
+        Familiar guardado = familiarRepo.save(familiar);
+        System.out.println("=== [FAMILIAR SERVICE] Guardado exitoso ===");
+        return guardado;
+    }
+
+    private void validarCedulaUnica(String cedula, String empleadoCodigoExcluir) {
+        if (empleadoRepo.existsByCedula(cedula)) {
+            throw new RuntimeException("La c\u00e9dula " + cedula + " pertenece a un empleado. Un familiar no puede ser empleado.");
+        }
+        if (familiarRepo.existsByCedula(cedula)) {
+            throw new RuntimeException("La c\u00e9dula " + cedula + " ya est\u00e1 registrada en otro familiar.");
+        }
     }
 
     @Transactional

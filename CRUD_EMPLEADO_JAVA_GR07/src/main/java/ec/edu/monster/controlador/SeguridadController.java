@@ -2,7 +2,9 @@ package ec.edu.monster.controlador;
 
 import ec.edu.monster.entidades.Empleado;
 import ec.edu.monster.entidades.Usuario;
+import ec.edu.monster.servicios.EmpleadoServicio;
 import ec.edu.monster.servicios.SeguridadServicio;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ public class SeguridadController {
 
     @Autowired
     private SeguridadServicio seguridadServicio;
+
+    @Autowired
+    private EmpleadoServicio empleadoServicio;
 
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody Map<String, String> payload) {
@@ -49,13 +54,16 @@ public class SeguridadController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales, HttpSession session) {
         String codigo = credenciales.get("codigo");
         String password = credenciales.get("password");
 
         boolean exito = seguridadServicio.autenticarUsuario(codigo, password);
 
         if (exito) {
+            Empleado emp = empleadoServicio.obtenerPorCodigo(codigo.trim().toUpperCase());
+            session.setAttribute("empleadoCodigo", emp.getCodigo());
+            session.setAttribute("empleadoNombres", emp.getNombres() + " " + emp.getApellidos());
             return ResponseEntity.ok("¡Login Exitoso! Bienvenido al Aplicativo Monster.");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

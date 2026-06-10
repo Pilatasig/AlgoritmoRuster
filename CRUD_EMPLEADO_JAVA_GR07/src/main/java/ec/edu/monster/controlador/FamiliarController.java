@@ -23,10 +23,20 @@ public class FamiliarController {
 
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Familiar nuevo) {
+        System.out.println("=== [FAMILIAR CONTROLLER] crear() ===");
+        System.out.println("id.codigoEmpleado: " + (nuevo.getId() != null ? nuevo.getId().getCodigoEmpleado() : "NULL"));
+        System.out.println("cedula: " + nuevo.getCedula());
+        System.out.println("nombres: " + nuevo.getNombres());
+        System.out.println("apellidos: " + nuevo.getApellidos());
+        System.out.println("fechaNacimiento: " + nuevo.getFechaNacimiento());
+        System.out.println("sexo.codigo: " + (nuevo.getSexo() != null ? nuevo.getSexo().getCodigo() : "NULL"));
         try {
             Familiar guardado = familiarServicio.guardar(nuevo);
+            System.out.println("=== [FAMILIAR CONTROLLER] Guardado OK, codigo=" + guardado.getId().getCodigo() + " ===");
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (Exception e) {
+            System.err.println("=== [FAMILIAR CONTROLLER] Error: " + e.getMessage() + " ===");
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Error al registrar familiar: " + e.getMessage());
         }
     }

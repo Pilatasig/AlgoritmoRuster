@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface EmpleadoRepositorio extends JpaRepository<Empleado, String>{
- @Query("SELECT MAX(e.codigo) FROM Empleado e")
+    @Query("SELECT MAX(e.codigo) FROM Empleado e")
     Optional<String> findLastCodigo();
+
+    boolean existsByCedula(String cedula);
 }

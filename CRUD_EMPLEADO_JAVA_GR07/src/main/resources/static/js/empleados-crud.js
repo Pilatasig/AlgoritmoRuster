@@ -23,6 +23,40 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('lblEditDiscap').textContent = e.target.checked ? "S\u00ed" : "No";
     });
 
+    document.getElementById('empFoto').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = document.getElementById('empPreviewFoto');
+                img.src = ev.target.result;
+                img.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('editFoto').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                let img = document.getElementById('editPreviewFoto');
+                if (!img) {
+                    const container = e.target.closest('.card-body') || e.target.parentElement;
+                    img = document.createElement('img');
+                    img.id = 'editPreviewFoto';
+                    img.className = 'img-fluid rounded border mb-3';
+                    img.style.cssText = 'max-height: 200px; object-fit: cover; width: 100%;';
+                    e.target.parentElement.insertBefore(img, e.target);
+                }
+                img.src = ev.target.result;
+                img.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     document.getElementById('formEmpleado').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -94,8 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById('famFechaNac').setAttribute('max', hoyString());
 
-    document.getElementById('formFamiliar').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    document.getElementById('btnGuardarFamiliar').addEventListener('click', async () => {
 
         const empleadoCodigo = document.getElementById('empCodigoGuardado').value;
         if (!empleadoCodigo) {
@@ -117,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fechaNacimiento: document.getElementById('famFechaNac').value,
             sexo: { codigo: document.getElementById('famSexo').value }
         };
+        console.log("[CREAR FAMILIAR] Payload enviado:", JSON.stringify(payload));
 
         const res = await fetch(API_FAMILIARES, {
             method: 'POST',
@@ -125,13 +159,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (res.ok) {
+            const guardado = await res.json();
+            console.log("[CREAR FAMILIAR] Respuesta exitosa:", JSON.stringify(guardado));
             mostrarAlerta("\u00a1Familiar guardado exitosamente!", "success");
-            document.getElementById('formFamiliar').reset();
+            document.getElementById('famCedula').value = '';
+            document.getElementById('famNombres').value = '';
+            document.getElementById('famApellidos').value = '';
+            document.getElementById('famFechaNac').value = '';
             document.getElementById('famSexo').value = 'M';
             document.getElementById('famFechaNac').setAttribute('max', hoyString());
             cargarFamiliares(empleadoCodigo);
         } else {
             const texto = await res.text();
+            console.error("[CREAR FAMILIAR] Error respuesta:", texto);
             mostrarAlerta("Error al guardar familiar: " + texto, "danger");
         }
     });
@@ -294,6 +334,11 @@ function abrirModalEditar(codigo) {
     const discap = emp.discapacidad || false;
     document.getElementById('editDiscapacidad').checked = discap;
     document.getElementById('lblEditDiscap').textContent = discap ? "S\u00ed" : "No";
+
+    const editPreview = document.getElementById('editPreviewFoto');
+    editPreview.src = API_EMPLEADOS + '/' + emp.codigo.trim() + '/foto';
+    editPreview.classList.remove('d-none');
+    editPreview.onerror = function () { this.classList.add('d-none'); };
 
     document.getElementById('editFormFamiliar').reset();
     document.getElementById('editFamSexoNew').value = 'M';

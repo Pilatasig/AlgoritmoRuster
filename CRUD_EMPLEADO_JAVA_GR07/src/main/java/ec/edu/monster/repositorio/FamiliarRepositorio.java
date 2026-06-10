@@ -12,6 +12,8 @@ public interface FamiliarRepositorio extends JpaRepository<Familiar, FamiliarId>
 
     List<Familiar> findByEmpleadoCodigo(String empleadoCodigo);
 
+    boolean existsByCedula(String cedula);
+
     @Query("SELECT MAX(f.id.codigo) FROM Familiar f WHERE f.id.codigoEmpleado = ?1")
     String findLastCodigoByEmpleado(String empleadoCodigo);
 }

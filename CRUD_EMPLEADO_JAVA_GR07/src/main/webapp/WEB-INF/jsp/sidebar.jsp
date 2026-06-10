@@ -8,8 +8,19 @@
     String activeFamil = uri.contains("familiares") ? "active-mod" : "";
 %>
 <div class="col-12 col-md-3 col-lg-2 sidebar d-flex flex-column p-3">
-    <div class="sidebar-brand text-white text-center py-4 mb-4 fw-bold">
+    <div class="sidebar-brand text-white text-center py-3 mb-3 fw-bold">
         <span class="text-primary">MÓDULO</span> MONSTER
+    </div>
+
+    <div class="text-center mb-3">
+        <img src="${pageContext.request.contextPath}/api/empleados/<%= session.getAttribute("empleadoCodigo") != null ? session.getAttribute("empleadoCodigo") : "" %>/foto"
+             class="rounded-circle border border-2 border-light"
+             width="64" height="64"
+             style="object-fit: cover;"
+             onerror="this.style.display='none'">
+        <div class="text-white small mt-1 fw-bold">
+            <%= session.getAttribute("empleadoNombres") != null ? session.getAttribute("empleadoNombres") : "" %>
+        </div>
     </div>
     
     <ul class="nav flex-column flex-grow-1">
@@ -40,7 +51,7 @@
     </ul>
     
     <div class="mt-auto pt-4 border-top border-secondary">
-        <a href="${pageContext.request.contextPath}/login" class="btn btn-outline-danger w-100 btn-sm fw-bold py-2">
+        <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-danger w-100 btn-sm fw-bold py-2">
             Cerrar Sesión
         </a>
     </div>

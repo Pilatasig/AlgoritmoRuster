@@ -28,6 +28,12 @@ public class EmpleadoServicio {
     private SexoRepositorio sexoRepo;
 
     @Transactional(readOnly = true)
+    public Empleado obtenerPorCodigo(String codigo) {
+        return empleadoRepo.findById(codigo)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado: " + codigo));
+    }
+
+    @Transactional(readOnly = true)
     public List<Empleado> listarTodos() {
         List<Empleado> lista = empleadoRepo.findAll();
         lista.forEach(e -> {

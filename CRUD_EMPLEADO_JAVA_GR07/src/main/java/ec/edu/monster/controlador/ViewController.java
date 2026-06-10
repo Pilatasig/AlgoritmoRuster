@@ -1,5 +1,6 @@
 package ec.edu.monster.controlador;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -44,5 +45,11 @@ public class ViewController {
     @GetMapping("/familiares")
     public String mostrarFamiliares(){
         return "familiar";
+    }
+
+    @GetMapping("/logout")
+    public String cerrarSesion(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
     }
 }

@@ -16,8 +16,7 @@ public class Familiar implements Serializable {
     private FamiliarId id = new FamiliarId();
 
     @ManyToOne
-    @MapsId("codigoEmpleado")
-    @JoinColumn(name = "PEEMP_CODIGO", referencedColumnName = "PEEMP_CODIGO")
+    @JoinColumn(name = "PEEMP_CODIGO", referencedColumnName = "PEEMP_CODIGO", insertable = false, updatable = false)
     @JsonIgnoreProperties({"asignaciones", "superior", "estadoCivil", "sexo", "foto", "fotoBase64"})
     private Empleado empleado;
 

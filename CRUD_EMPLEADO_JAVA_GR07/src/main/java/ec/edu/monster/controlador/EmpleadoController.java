@@ -3,7 +3,9 @@ package ec.edu.monster.controlador;
 import ec.edu.monster.entidades.Empleado;
 import ec.edu.monster.servicios.EmpleadoServicio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -51,5 +53,16 @@ public class EmpleadoController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al eliminar: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/{codigo}/foto")
+    public ResponseEntity<byte[]> obtenerFoto(@PathVariable String codigo) {
+        Empleado emp = empleadoServicio.obtenerPorCodigo(codigo.trim().toUpperCase());
+        if (emp.getFoto() != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            return new ResponseEntity<>(emp.getFoto(), headers, HttpStatus.OK);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
