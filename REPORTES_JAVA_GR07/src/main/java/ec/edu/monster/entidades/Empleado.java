@@ -55,13 +55,11 @@ public class Empleado implements Serializable {
     @Transient
     private String fotoBase64;
 
-    // RELACIÓN REFLEXIVA: Un empleado dirige/supervisa a otro (EMPLEADO-SUPERVISOR)
     @ManyToOne
     @JoinColumn(name = "PEEMP_SUPERIOR", referencedColumnName = "PEEMP_CODIGO")
     @JsonIgnoreProperties({"asignaciones", "superior"})
     private Empleado superior;
 
-    // RELACIÓN HISTÓRICA: Cargos asignados mediante la tabla intermedia
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("empleado")
     private List<AsignacionCargo> asignaciones = new ArrayList<>();

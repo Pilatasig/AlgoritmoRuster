@@ -11,7 +11,7 @@
 	<groupId>ec.edu.monster</groupId>
 	<artifactId>ProyectoMonster</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>CRUD_EMPLEADO_JAVA_GR07</name>
+	<name>REPORTES_JAVA_GR07</name>
 	<description>Proyecto ORM Monster</description>
 	
 	<properties>
