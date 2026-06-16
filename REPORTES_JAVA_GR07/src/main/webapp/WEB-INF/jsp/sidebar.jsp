@@ -6,6 +6,7 @@
     String activeCargos = uri.contains("cargos") ? "active-mod" : "";
     String activeEmple = uri.contains("empleados") ? "active-mod" : "";
     String activeFamil = uri.contains("familiares") ? "active-mod" : "";
+    String activeRepor = uri.contains("reportes") ? "active-mod" : "";
 %>
 <div class="col-12 col-md-3 col-lg-2 sidebar d-flex flex-column p-3">
     <div class="sidebar-brand text-white text-center py-3 mb-3 fw-bold">
@@ -46,6 +47,12 @@
             <a href="${pageContext.request.contextPath}/empleados" class="nav-link-menu <%= activeEmple %>">
                 <span class="menu-icon-circle bg-warning text-white">E</span>
                 Empleados
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/reportes" class="nav-link-menu <%= activeRepor %>">
+                <span class="menu-icon-circle bg-danger text-white">R</span>
+                Reportes
             </a>
         </li>
     </ul>

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsuperId implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String usuario;
     private String perfil;
 }

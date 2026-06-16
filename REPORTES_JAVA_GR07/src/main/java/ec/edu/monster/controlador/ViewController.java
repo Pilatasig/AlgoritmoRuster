@@ -42,9 +42,14 @@ public class ViewController {
         return "empleado";
     }
 
+    @GetMapping("/reportes")
+    public String mostrarReportes(){
+        return "reportes";
+    }
+
     @GetMapping("/familiares")
     public String mostrarFamiliares(){
-        return "familiar";
+        return "redirect:/empleados";
     }
 
     @GetMapping("/logout")

@@ -1,9 +1,12 @@
 package ec.edu.monster.servicios;
 
 import ec.edu.monster.entidades.AsignacionCargo;
+import ec.edu.monster.entidades.AsignacionCargoId;
+import ec.edu.monster.entidades.Cargo;
 import ec.edu.monster.entidades.Empleado;
 import ec.edu.monster.entidades.EstadoCivil;
 import ec.edu.monster.entidades.Sexo;
+import ec.edu.monster.repositorio.CargoRepositorio;
 import ec.edu.monster.repositorio.EmpleadoRepositorio;
 import ec.edu.monster.repositorio.EstadoCivilRepositorio;
 import ec.edu.monster.repositorio.SexoRepositorio;
@@ -27,6 +30,9 @@ public class EmpleadoServicio {
     @Autowired
     private SexoRepositorio sexoRepo;
 
+    @Autowired
+    private CargoRepositorio cargoRepo;
+
     @Transactional(readOnly = true)
     public Empleado obtenerPorCodigo(String codigo) {
         return empleadoRepo.findById(codigo)
@@ -45,7 +51,6 @@ public class EmpleadoServicio {
 
     @Transactional
     public Empleado guardar(Empleado empleado, String codigoCargoSeleccionado) {
-        // Generar Código Automático si es un registro nuevo
         if (empleado.getCodigo() == null || empleado.getCodigo().trim().isEmpty()) {
             empleado.setCodigo(generarSiguienteCodigo());
         }
@@ -64,17 +69,19 @@ public class EmpleadoServicio {
             empleado.setFoto(Base64.getDecoder().decode(empleado.getFotoBase64()));
         }
 
-        // Si se envió un cargo desde la pestaña laboral, gestionamos la tabla intermedia
         if (codigoCargoSeleccionado != null && !codigoCargoSeleccionado.isEmpty()) {
             boolean yaTieneEseCargo = empleado.getAsignaciones().stream()
                     .anyMatch(a -> a.getId().getCodigoCargo().equals(codigoCargoSeleccionado));
             
             if (!yaTieneEseCargo) {
+                Cargo cargo = cargoRepo.findByIdCodigo(codigoCargoSeleccionado)
+                        .orElseThrow(() -> new RuntimeException("Cargo no encontrado: " + codigoCargoSeleccionado));
+                
                 AsignacionCargo nuevaAsignacion = new AsignacionCargo();
                 nuevaAsignacion.setEmpleado(empleado);
                 nuevaAsignacion.getId().setCodigoEmpleado(empleado.getCodigo());
                 nuevaAsignacion.getId().setCodigoCargo(codigoCargoSeleccionado);
-                nuevaAsignacion.getId().setFechaInicio(new Date()); // Fecha de hoy como inicio laboral
+                nuevaAsignacion.getId().setFechaInicio(new Date());
                 
                 empleado.getAsignaciones().add(nuevaAsignacion);
             }
@@ -84,7 +91,7 @@ public class EmpleadoServicio {
     }
 
     @Transactional
-    public Empleado editar(String codigo, Empleado datos) {
+    public Empleado editar(String codigo, Empleado datos, String cargoCodigo) {
         Empleado emp = empleadoRepo.findById(codigo)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado: " + codigo));
 
@@ -101,11 +108,42 @@ public class EmpleadoServicio {
             emp.setEstadoCivil(ec);
         }
 
+        if (datos.getSuperior() != null && datos.getSuperior().getCodigo() != null) {
+            Empleado sup = empleadoRepo.findById(datos.getSuperior().getCodigo()).orElse(null);
+            emp.setSuperior(sup);
+        } else {
+            emp.setSuperior(null);
+        }
+
         if (datos.getFotoBase64() != null && !datos.getFotoBase64().isEmpty()) {
             emp.setFoto(Base64.getDecoder().decode(datos.getFotoBase64()));
         }
 
-        return empleadoRepo.save(emp);
+        if (cargoCodigo != null && !cargoCodigo.isBlank()) {
+            String cargoActualCodigo = emp.getAsignaciones().isEmpty()
+                    ? null
+                    : emp.getAsignaciones().get(emp.getAsignaciones().size() - 1).getId().getCodigoCargo();
+
+            if (!cargoCodigo.equals(cargoActualCodigo)) {
+                Cargo nuevoCargo = cargoRepo.findByIdCodigo(cargoCodigo).orElse(null);
+                if (nuevoCargo == null) {
+                    throw new RuntimeException("Cargo no encontrado: " + cargoCodigo);
+                }
+                AsignacionCargoId nuevaId = new AsignacionCargoId();
+                nuevaId.setCodigoEmpleado(emp.getCodigo());
+                nuevaId.setCodigoCargo(nuevoCargo.getCodigo());
+                nuevaId.setFechaInicio(new Date());
+
+                AsignacionCargo nuevaAsignacion = new AsignacionCargo();
+                nuevaAsignacion.setId(nuevaId);
+                nuevaAsignacion.setEmpleado(emp);
+                nuevaAsignacion.setCargo(nuevoCargo);
+
+                emp.getAsignaciones().add(nuevaAsignacion);
+            }
+        }
+
+        return empleadoRepo.saveAndFlush(emp);
     }
 
     @Transactional

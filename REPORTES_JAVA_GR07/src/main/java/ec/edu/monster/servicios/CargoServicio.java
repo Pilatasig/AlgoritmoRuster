@@ -1,26 +1,27 @@
 package ec.edu.monster.servicios;
 
 import ec.edu.monster.entidades.Cargo;
+import ec.edu.monster.entidades.Departamento;
 import ec.edu.monster.repositorio.CargoRepositorio;
+import ec.edu.monster.repositorio.DepartamentoRepositorio;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- *
- * @author Usuario
- */
 @Service
 public class CargoServicio {
     
     @Autowired
     private CargoRepositorio cargoRepo;
+
+    @Autowired
+    private DepartamentoRepositorio departamentoRepo;
     
     @Transactional(readOnly = true)
     public List<Cargo> listarCargos(){
-        List<Cargo> lista = cargoRepo.findAll();
+        List<Cargo> lista = cargoRepo.findAllWithAsignaciones();
         lista.forEach(c -> {
             if (c.getCodigo() != null) c.setCodigo(c.getCodigo().trim());
             if (c.getNombre() != null) c.setNombre(c.getNombre().trim());
@@ -36,7 +37,7 @@ public class CargoServicio {
     @Transactional(readOnly = true)
     public Optional<Cargo> obtenerPorCodigo(String codigo){
         if (codigo == null) return Optional.empty();
-        return cargoRepo.findById(codigo.trim().toUpperCase());
+        return cargoRepo.findByIdCodigo(codigo.trim().toUpperCase());
     }
     
     @Transactional
@@ -57,7 +58,9 @@ public class CargoServicio {
         }
         
         if (cargo.getDepartamento() != null && cargo.getDepartamento().getCodigo() != null) {
-            cargo.getDepartamento().setCodigo(cargo.getDepartamento().getCodigo().trim().toUpperCase());
+            Departamento dep = departamentoRepo.findById(cargo.getDepartamento().getCodigo().trim().toUpperCase())
+                .orElseThrow(() -> new RuntimeException("Departamento no encontrado"));
+            cargo.setDepartamento(dep);
         }
         
         return cargoRepo.saveAndFlush(cargo);

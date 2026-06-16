@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarComponentesAuxiliares();
     cargarEmpleados();
 
-    document.getElementById('empFechaNac').setAttribute('max', hoyString());
+    document.getElementById('empFechaNac').setAttribute('max', restarAnios(new Date(), 18));
+    document.getElementById('empFechaNac').setAttribute('min', restarAnios(new Date(), 100));
 
     document.getElementById('empDiscapacidad').addEventListener('change', (e) => {
         document.getElementById('lblDiscapacidad').textContent = e.target.checked ? "S\u00ed" : "No";
@@ -340,6 +341,8 @@ function abrirModalEditar(codigo) {
     editPreview.classList.remove('d-none');
     editPreview.onerror = function () { this.classList.add('d-none'); };
 
+    cargarEditCombos(emp);
+
     document.getElementById('editFormFamiliar').reset();
     document.getElementById('editFamSexoNew').value = 'M';
     document.getElementById('editFamiliaresContainer').classList.add('d-none');
@@ -347,6 +350,31 @@ function abrirModalEditar(codigo) {
 
     document.querySelector('#edit-tab-generales').click();
     instanciaModal.show();
+}
+
+async function cargarEditCombos(emp) {
+    try {
+        const resC = await fetch(API_CARGOS);
+        const cargos = await resC.json();
+        const comboCC = document.getElementById('editComboCargo');
+        comboCC.innerHTML = '<option value="" selected disabled>Seleccione...</option>';
+        cargos.forEach(c => comboCC.innerHTML += '<option value="' + c.codigo.trim() + '">' + c.nombre.trim() + ' - ' + c.descripcion.trim() + '</option>');
+
+        const cargoActual = emp.asignaciones && emp.asignaciones.length > 0 ? emp.asignaciones[0].id.codigoCargo.trim() : '';
+        if (cargoActual) comboCC.value = cargoActual;
+
+        const resE = await fetch(API_EMPLEADOS);
+        const emps = await resE.json();
+        const comboS = document.getElementById('editComboSuperior');
+        comboS.innerHTML = '<option value="">-- Ninguno --</option>';
+        emps.forEach(e => comboS.innerHTML += '<option value="' + e.codigo.trim() + '">' + e.apellidos + ' ' + e.nombres + '</option>');
+
+        if (emp.superior && emp.superior.codigo) {
+            comboS.value = emp.superior.codigo.trim();
+        }
+    } catch (err) {
+        console.error("Error al cargar combos de edici\u00f3n", err);
+    }
 }
 
 async function guardarEdicion() {
@@ -361,6 +389,9 @@ async function guardarEdicion() {
     const fotoFile = document.getElementById('editFoto').files[0];
     const fotoBase64 = fotoFile ? await fileToBase64(fotoFile) : null;
 
+    const cargoCodigo = document.getElementById('editComboCargo').value;
+    const superiorCodigo = document.getElementById('editComboSuperior').value;
+
     const payload = {
         salario: parseFloat(document.getElementById('editSalario').value),
         nombres: document.getElementById('editNombres').value.trim(),
@@ -370,10 +401,14 @@ async function guardarEdicion() {
         direccion: document.getElementById('editDireccion').value.trim(),
         estadoCivil: { codigo: document.getElementById('editEstadoCivil').value },
         discapacidad: document.getElementById('editDiscapacidad').checked,
-        fotoBase64: fotoBase64
+        fotoBase64: fotoBase64,
+        superior: superiorCodigo ? { codigo: superiorCodigo } : null
     };
 
-    const res = await fetch(`${API_EMPLEADOS}/${codigo}`, {
+    let url = `${API_EMPLEADOS}/${codigo}`;
+    if (cargoCodigo) url += `?cargoCodigo=${encodeURIComponent(cargoCodigo)}`;
+
+    const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -410,6 +445,12 @@ function mostrarAlerta(mensaje, tipo) {
 
 function hoyString() {
     return new Date().toISOString().split('T')[0];
+}
+
+function restarAnios(fecha, anios) {
+    const f = new Date(fecha);
+    f.setFullYear(f.getFullYear() - anios);
+    return f.toISOString().split('T')[0];
 }
 
 function calcularEdad(fechaNacimiento) {

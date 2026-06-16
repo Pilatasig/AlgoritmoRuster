@@ -1,4 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.Calendar, java.text.SimpleDateFormat" %>
+<%
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    cal.add(Calendar.YEAR, -18);
+    String fechaMaxNac = sdf.format(cal.getTime());
+
+    cal = Calendar.getInstance();
+    cal.add(Calendar.YEAR, -100);
+    String fechaMinNac = sdf.format(cal.getTime());
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -41,7 +53,7 @@
 
                 <div class="tab-pane fade show active" id="panelNuevo" role="tabpanel">
                     <div class="card border-0 shadow-sm p-4 bg-white">
-                        <form id="formEmpleado">
+                        <form id="formEmpleado" novalidate>
 
                             <div class="alert alert-dark border-0 p-3 mb-4">
                                 <h5 class="fw-bold text-white mb-3"><i class="bi bi-person-badge"></i> Datos Primarios Identificativos</h5>
@@ -84,7 +96,7 @@
                                             <div class="row g-3">
                                                 <div class="col-md-4">
                                                     <label class="form-label fw-semibold">Fecha de Nacimiento</label>
-                                                    <input type="date" class="form-control" id="empFechaNac" required>
+                                                    <input type="date" class="form-control" id="empFechaNac" required min="<%= fechaMinNac %>" max="<%= fechaMaxNac %>">
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label class="form-label fw-semibold">Estado Civil</label>
@@ -372,6 +384,18 @@
                             <div class="col-12">
                                 <label class="form-label fw-semibold small">C&oacute;digo Empleado</label>
                                 <input type="text" class="form-control form-control-sm bg-light" id="editCodigoDisplay" readonly>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Cargo</label>
+                                <select class="form-select form-select-sm" id="editComboCargo">
+                                    <option value="" selected disabled>Seleccione un cargo...</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Superior Directo</label>
+                                <select class="form-select form-select-sm" id="editComboSuperior">
+                                    <option value="">-- Ninguno --</option>
+                                </select>
                             </div>
                             <div class="col-6">
                                 <label class="form-label fw-semibold small">Salario</label>

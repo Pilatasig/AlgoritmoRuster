@@ -95,6 +95,8 @@
             </div>
             <div class="modal-body">
                 
+                <input type="hidden" id="editCodigoCargo">
+                
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nombre Corto</label>
                     <input type="text" class="form-control text-uppercase" id="editNombreCargo" maxlength="3" required>

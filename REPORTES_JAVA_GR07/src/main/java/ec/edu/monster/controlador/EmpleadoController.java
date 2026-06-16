@@ -34,10 +34,10 @@ public class EmpleadoController {
     }
 
     @PutMapping("/{codigo}")
-    public ResponseEntity<?> actualizar(@PathVariable String codigo, @RequestBody Empleado datos) {
+    public ResponseEntity<?> actualizar(@PathVariable String codigo, @RequestBody Empleado datos, @RequestParam(required = false) String cargoCodigo) {
         String codigoLimpio = codigo.trim().toUpperCase();
         try {
-            Empleado actualizado = empleadoServicio.editar(codigoLimpio, datos);
+            Empleado actualizado = empleadoServicio.editar(codigoLimpio, datos, cargoCodigo);
             return ResponseEntity.ok(actualizado);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al actualizar: " + e.getMessage());
@@ -57,11 +57,15 @@ public class EmpleadoController {
 
     @GetMapping("/{codigo}/foto")
     public ResponseEntity<byte[]> obtenerFoto(@PathVariable String codigo) {
-        Empleado emp = empleadoServicio.obtenerPorCodigo(codigo.trim().toUpperCase());
-        if (emp.getFoto() != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            return new ResponseEntity<>(emp.getFoto(), headers, HttpStatus.OK);
+        try {
+            Empleado emp = empleadoServicio.obtenerPorCodigo(codigo.trim().toUpperCase());
+            if (emp.getFoto() != null) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.IMAGE_JPEG);
+                return new ResponseEntity<>(emp.getFoto(), headers, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            // Empleado no encontrado
         }
         return ResponseEntity.notFound().build();
     }
