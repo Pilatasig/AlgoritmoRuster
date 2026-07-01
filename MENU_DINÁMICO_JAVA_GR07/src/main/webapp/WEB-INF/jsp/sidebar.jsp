@@ -14,7 +14,7 @@
     String activeAsPer = uri.contains("asignar-perfiles") ? "active-mod" : "";
     String activeOpcPe = uri.contains("opciones-perfil") ? "active-mod" : "";
     String activeEmple = uri.contains("empleados") ? "active-mod" : "";
-    String activeRepor = uri.contains("reportes") ? "active-mod" : "";
+    String activeRepor = uri.contains("reportes") && !uri.contains("reportes-financieros") ? "active-mod" : "";
     String activeUsuarios = uri.contains("usuarios") ? "active-mod" : "";
     String activeFacturacion = uri.contains("facturacion") ? "active-mod" : "";
     String activePresupuestos = uri.contains("presupuestos") ? "active-mod" : "";

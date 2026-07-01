@@ -1,7 +1,23 @@
 package ec.edu.monster.config;
 
-import ec.edu.monster.entidades.*;
-import ec.edu.monster.repositorio.*;
+import ec.edu.monster.repositorio.jpa.UsuarioRepositorio;
+import ec.edu.monster.repositorio.jpa.EstadoCivilRepositorio;
+import ec.edu.monster.repositorio.jpa.CargoRepositorio;
+import ec.edu.monster.repositorio.jpa.SexoRepositorio;
+import ec.edu.monster.repositorio.jpa.DepartamentoRepositorio;
+import ec.edu.monster.repositorio.jpa.PerfilRepositorio;
+import ec.edu.monster.repositorio.jpa.EmpleadoRepositorio;
+import ec.edu.monster.repositorio.jpa.EstadoRepositorio;
+import ec.edu.monster.entidades.jpa.Perfil;
+import ec.edu.monster.entidades.jpa.Usuario;
+import ec.edu.monster.entidades.jpa.AsignacionCargo;
+import ec.edu.monster.entidades.jpa.Departamento;
+import ec.edu.monster.entidades.jpa.EstadoCivil;
+import ec.edu.monster.entidades.jpa.Cargo;
+import ec.edu.monster.entidades.jpa.AsignacionCargoId;
+import ec.edu.monster.entidades.jpa.Empleado;
+import ec.edu.monster.entidades.jpa.Sexo;
+import ec.edu.monster.entidades.jpa.Estado;
 import jakarta.transaction.Transactional;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +136,8 @@ public class DataInitializer implements CommandLineRunner {
         admin = empleadoRep.save(admin);
 
         Perfil perfil = new Perfil();
-        perfil.setCodigo("ADMIN");
+        perfil.setCodigo("PER001");
+        perfil.setNombre("ADM");
         perfil.setDescripcion("Administrador");
         perfil.setObservaciones("Perfil con acceso total al sistema");
         perfilRep.save(perfil);
@@ -129,7 +146,7 @@ public class DataInitializer implements CommandLineRunner {
                 .orElseThrow(() -> new RuntimeException("Estado 'A' no encontrado"));
 
         Usuario usuario = new Usuario();
-        usuario.setId("EMP00001");
+        // El id se asigna automáticamente desde empleado.codigo vía @MapsId
         usuario.setPassword(encoder.encode("123456"));
         usuario.setFechaCreacion(new Date());
         usuario.setPieFirma("Administrador del Sistema");

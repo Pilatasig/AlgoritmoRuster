@@ -3,7 +3,7 @@ package ec.edu.monster.pdf;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
-import ec.edu.monster.entidades.Empleado;
+import ec.edu.monster.entidades.jpa.Empleado;
 import java.util.List;
 
 public class EmpleadoListaPdf {

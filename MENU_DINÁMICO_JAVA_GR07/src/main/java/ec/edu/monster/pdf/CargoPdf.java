@@ -3,7 +3,7 @@ package ec.edu.monster.pdf;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
-import ec.edu.monster.entidades.Cargo;
+import ec.edu.monster.entidades.jpa.Cargo;
 import java.util.List;
 
 public class CargoPdf {

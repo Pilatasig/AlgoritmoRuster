@@ -1,0 +1,114 @@
+package ec.edu.monster.servicios.jpa;
+
+import ec.edu.monster.entidades.jpa.Empleado;
+import ec.edu.monster.entidades.jpa.Familiar;
+import ec.edu.monster.entidades.jpa.FamiliarId;
+import ec.edu.monster.entidades.jpa.Sexo;
+import ec.edu.monster.repositorio.jpa.EmpleadoRepositorio;
+import ec.edu.monster.repositorio.jpa.FamiliarRepositorio;
+import ec.edu.monster.repositorio.jpa.SexoRepositorio;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class FamiliarServicio {
+
+    @Autowired
+    private FamiliarRepositorio familiarRepo;
+
+    @Autowired
+    private EmpleadoRepositorio empleadoRepo;
+
+    @Autowired
+    private SexoRepositorio sexoRepo;
+
+    @Transactional(readOnly = true)
+    public List<Familiar> listarPorEmpleado(String empleadoCodigo) {
+        List<Familiar> lista = familiarRepo.findByEmpleadoCodigo(empleadoCodigo);
+        lista.forEach(f -> {
+            if (f.getId().getCodigo() != null) f.getId().setCodigo(f.getId().getCodigo().trim());
+            if (f.getId().getCodigoEmpleado() != null) f.getId().setCodigoEmpleado(f.getId().getCodigoEmpleado().trim());
+            if (f.getCedula() != null) f.setCedula(f.getCedula().trim());
+        });
+        return lista;
+    }
+
+    @Transactional
+    public Familiar guardar(Familiar familiar) {
+        System.out.println("=== [FAMILIAR SERVICE] guardar() ===");
+        System.out.println("Buscando empleado con codigo: " + familiar.getId().getCodigoEmpleado());
+        empleadoRepo.findById(familiar.getId().getCodigoEmpleado())
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        validarCedulaUnica(familiar.getCedula(), null);
+
+        familiar.getId().setCodigo(generarSiguienteCodigo(familiar.getId().getCodigoEmpleado()));
+        System.out.println("Codigo generado para familiar: " + familiar.getId().getCodigo());
+
+        if (familiar.getSexo() != null && familiar.getSexo().getCodigo() != null) {
+            Sexo s = sexoRepo.findById(familiar.getSexo().getCodigo()).orElse(null);
+            System.out.println("Sexo resuelto: " + (s != null ? s.getCodigo() : "NULL"));
+            familiar.setSexo(s);
+        }
+
+        System.out.println("Intentando guardar Familiar con PEEMP_CODIGO=" + familiar.getId().getCodigoEmpleado()
+                + ", PEFAM_CODIGO=" + familiar.getId().getCodigo()
+                + ", PEFAM_CEDULA=" + familiar.getCedula()
+                + ", PESEX_CODIGO=" + (familiar.getSexo() != null ? familiar.getSexo().getCodigo() : "NULL"));
+        Familiar guardado = familiarRepo.save(familiar);
+        System.out.println("=== [FAMILIAR SERVICE] Guardado exitoso ===");
+        return guardado;
+    }
+
+    private void validarCedulaUnica(String cedula, String empleadoCodigoExcluir) {
+        if (empleadoRepo.existsByCedula(cedula)) {
+            throw new RuntimeException("La c\u00e9dula " + cedula + " pertenece a un empleado. Un familiar no puede ser empleado.");
+        }
+        if (familiarRepo.existsByCedula(cedula)) {
+            throw new RuntimeException("La c\u00e9dula " + cedula + " ya est\u00e1 registrada en otro familiar.");
+        }
+    }
+
+    @Transactional
+    public Familiar editar(String empleadoCodigo, String codigo, Familiar datos) {
+        FamiliarId id = new FamiliarId();
+        id.setCodigoEmpleado(empleadoCodigo);
+        id.setCodigo(codigo);
+
+        Familiar fam = familiarRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Familiar no encontrado"));
+
+        fam.setApellidos(datos.getApellidos());
+        fam.setNombres(datos.getNombres());
+        fam.setFechaNacimiento(datos.getFechaNacimiento());
+
+        return familiarRepo.save(fam);
+    }
+
+    @Transactional
+    public void eliminar(String empleadoCodigo, String codigo) {
+        FamiliarId id = new FamiliarId();
+        id.setCodigoEmpleado(empleadoCodigo);
+        id.setCodigo(codigo);
+
+        if (!familiarRepo.existsById(id)) {
+            throw new RuntimeException("Familiar no encontrado");
+        }
+        familiarRepo.deleteById(id);
+    }
+
+    private String generarSiguienteCodigo(String empleadoCodigo) {
+        String maxCodigo = familiarRepo.findLastCodigoByEmpleado(empleadoCodigo);
+        if (maxCodigo == null) return "FAM001";
+
+        String parteNumerica = maxCodigo.trim().substring(3);
+        try {
+            int siguiente = Integer.parseInt(parteNumerica) + 1;
+            return String.format("FAM%03d", siguiente);
+        } catch (NumberFormatException e) {
+            return "FAM001";
+        }
+    }
+}
